@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f8f8;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px;
+        }
+
+        #chatbox {
+            width: 70%;
+            height: 400px;
+            border: 1px solid #ddd;
+            margin: auto;
+            padding: 10px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        }
+
+        .user, .bot {
+            margin: 5px;
+            padding: 10px;
+            border-radius: 10px;
+            width: 70%;
+        }
+
+        .user {
+            align-self: flex-end;
+            background-color: #ADD8E6;
+        }
+
+        .bot {
+            align-self: flex-start;
+            background-color: #F0F8FF;
+        }
+
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .form-center {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        #inputForm {
+            width: 70%;
+        }
+
+        #input {
+            flex-grow: 1;
+        }
+
+        .btn-primary {
+            background-color: #428bca;
+            border-color: #357ebd;
+        }
+
+        .icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+    </style>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Welcome to the Chatbot!</h1>
+    <div id="chatbox">
+        <!-- Chat messages will be added here -->
+    </div>
+    <div class="form-center">
+        <form id="inputForm" class="form-inline">
+            <input type="text" id="input" autocomplete="off" class="form-control mr-2" />
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+    </div>
+    <div id="loading">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('inputForm').addEventListener('submit', function(e){
+            e.preventDefault();
+            let message = document.getElementById('input').value;
+            document.getElementById('input').value = '';
+
+            let chatbox = document.getElementById('chatbox');
+            chatbox.innerHTML += '<div class="user"><img src="img/usericon.png" alt="User Icon" class="icon">' + message + '</div>';
+
+            document.getElementById('loading').style.display = 'block';
+
+            axios.post('/api/chat', { prompt: message })
+            .then(function(response){
+                console.log(response.data.content);
+                let botMessage = response.data.content;
+                chatbox.innerHTML += '<div class="bot"><img src="img/gpticon.png" alt="ChatBot Icon" class="icon">' + botMessage + '</div>';
+                chatbox.scrollTop = chatbox.scrollHeight;
+
+                document.getElementById('loading').style.display = 'none';
+            })
+            .catch(function(error){
+                console.error(error);
+                document.getElementById('loading').style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
